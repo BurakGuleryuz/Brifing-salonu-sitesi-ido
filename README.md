@@ -1,59 +1,165 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🛳️ Dijital Signage ve Toplantı Odası Yönetim Sistemi
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> İstanbul Deniz Otobüsleri (İDO) — Bilgi Teknolojileri Birimi  
+> **Staj Projesi** | Ağustos 2026 | Burak Güleryüz
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📋 Proje Hakkında
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Şirket içi toplantı odalarının rezervasyon, çakışma denetimi ve anlık doluluk gösteriminin tek bir rol tabanlı sistem üzerinden yönetilmesini sağlayan bir web uygulamasıdır.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Çözülen problemler:**
+- ❌ Aynı oda ve saatte birden fazla toplantı ayarlanabiliyordu (çakışma)
+- ❌ Odaların doluluk durumu salonun önüne gelinmeden anlaşılamıyordu
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## ✨ Özellikler
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Özellik | Açıklama |
+|---|---|
+| 🔒 Kimlik Doğrulama | Kimlik no + şifre ile giriş; bcrypt ile şifreleme |
+| 👥 Rol Yönetimi | Personel, Stajyer, Bakım Sorumlusu, Özel Kalem Müdürü |
+| 🚫 Çakışma Kontrolü | Aynı oda/saat çakışması otomatik engellenir |
+| 📺 Brifing Ekranı | 60 sn'de bir yenilenen, şifresiz erişilebilir signage ekranı |
+| 🔧 Arıza Modülü | Bakım sorumlusu oda arızasını işaretleyebilir |
+| 📧 Acil Bildirim | Acil toplantılarda tüm kullanıcılara otomatik e-posta |
+| 🏛️ Yönetim Kurulu | Gizli toplantı tipi; yalnızca yetkili rol görebilir |
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🛠️ Teknolojiler
 
-### Premium Partners
+- **Backend:** PHP 8 · Laravel 12 · Eloquent ORM
+- **Frontend:** Blade · Bootstrap 5 · JavaScript · SVG Animasyonlar
+- **Veritabanı:** MySQL (XAMPP)
+- **Araçlar:** Git · GitHub · Artisan CLI · Composer
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 🚀 Kurulum
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Gereksinimler
+- PHP 8.1+
+- Composer
+- MySQL (XAMPP önerilir)
 
-## Code of Conduct
+### Adımlar
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# 1. Repoyu klonla
+git clone https://github.com/BurakGuleryuz/Brifing-salonu-sitesi-ido.git
+cd Brifing-salonu-sitesi-ido
 
-## Security Vulnerabilities
+# 2. Bağımlılıkları kur
+composer install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 3. .env dosyasını oluştur
+cp .env.example .env
 
-## License
+# 4. Uygulama anahtarı üret
+php artisan key:generate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### `.env` Veritabanı Ayarları
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=brifing_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+```bash
+# 5. phpMyAdmin'den brifing_db adında veritabanı oluştur
+
+# 6. Tabloları oluştur
+php artisan migrate
+
+# 7. Sunucuyu başlat
+php artisan serve
+```
+
+Uygulama `http://127.0.0.1:8000` adresinde çalışacak.
+
+---
+
+## 👤 Kullanıcı Oluşturma
+
+`/register` sayfasından kayıt ol. İlk kayıt otomatik olarak `000001` kimlik numarasını alır.
+
+Rol atamak için:
+
+```bash
+php artisan tinker
+```
+
+```php
+App\Models\User::where('employee_id', '000001')->update(['role' => 'ozel_kalem_muduru']);
+App\Models\User::where('employee_id', '000002')->update(['role' => 'bakim_sorumlusu']);
+App\Models\User::where('employee_id', '000003')->update(['role' => 'personel']);
+// rol belirtilmezse varsayılan: personel
+```
+
+---
+
+## 🔐 Rol Yetki Matrisi
+
+| Rol | Toplantı Oluşturma | Düzenleme | Oda Arıza Durumu |
+|---|:---:|:---:|:---:|
+| Stajyer | ❌ | ❌ | ❌ |
+| Personel | ✅ | ❌ | ❌ |
+| Bakım Sorumlusu | ❌ | ❌ | ✅ |
+| Özel Kalem Müdürü | ✅ | ✅ | ✅ |
+
+> Yönetim Kurulu toplantıları yalnızca Özel Kalem Müdürü tarafından görülebilir/oluşturulabilir.
+
+---
+
+## 🏗️ Sistem Mimarisi
+
+Klasik Laravel MVC mimarisi kullanılmıştır:
+
+- **Route** → İstekleri controller'a yönlendirir
+- **Middleware** → Giriş yapmamış kullanıcıyı engeller  
+- **Controller** → İş mantığı + rol tabanlı yetki kontrolü
+- **Model** → Veritabanı ilişkileri + çakışma algoritması
+- **View** → Blade şablonları ile kullanıcı arayüzü
+
+---
+
+## 📁 Proje Yapısı
+
+brifing-site/
+├── app/Http/Controllers/
+│ ├── Auth/LoginController.php # Giriş, kayıt, şifre sıfırlama
+│ ├── RoomController.php # Oda CRUD + arıza yönetimi
+│ ├── MeetingController.php # Toplantı CRUD + çakışma + mail
+│ └── SignageController.php # Brifing ekranı
+├── app/Models/
+│ ├── User.php # Roller, kimlik no
+│ ├── Room.php # Aktif/pasif/arızalı durum
+│ └── Meeting.php # Çakışma kontrolü (scopeOverlapping)
+├── resources/views/
+│ ├── auth/ # Giriş, kayıt, şifre sıfırlama
+│ ├── rooms/ # Oda yönetim ekranları
+│ ├── meetings/ # Toplantı yönetim ekranları
+│ ├── signage/ # Brifing ekranı (TV için)
+│ └── layouts/app.blade.php # Ortak layout
+└── routes/web.php
+
+
+---
+
+## 📄 Lisans
+
+Bu proje İDO (İstanbul Deniz Otobüsleri) bünyesinde staj kapsamında geliştirilmiştir.
+
+---
+
+<div align="center">
+  <sub>Geliştirici: <a href="https://github.com/BurakGuleryuz">Burak Güleryüz</a> · Bilgisayar Mühendisliği Stajyeri · 2026</sub>
+</div>
