@@ -16,44 +16,27 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
+    /**
+     * Giriş — sadece kimlik no + şifre gerektirir.
+     */
     public function login(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'employee_id' => ['required', 'string', 'max:50', $this->employeeIdRule()],
-            'name'        => 'required|string|max:255',
+            'employee_id' => 'required|string|max:50',
             'password'    => 'required|string|size:6',
         ]);
 
         $user = User::where('employee_id', $validated['employee_id'])->first();
 
-        if ($user) {
-            if (mb_strtolower(trim($user->name)) !== mb_strtolower(trim($validated['name']))) {
-                return back()->withInput()->withErrors([
-                    'name' => 'Bu sicil numarası farklı bir isimle kayıtlı. Bilgilerinizi kontrol edin.',
-                ]);
-            }
+        if (! $user) {
+            return back()->withInput()->withErrors([
+                'employee_id' => 'Bu kimlik no ile kayıtlı bir hesap bulunamadı. Önce "Kayıt Ol" ile hesap oluşturmalısınız.',
+            ]);
+        }
 
-            if (! Hash::check($validated['password'], $user->password)) {
-                return back()->withInput()->withErrors([
-                    'password' => 'Şifre hatalı.',
-                ]);
-            }
-        } else {
-            // Aynı isimle (başka bir kimlik no altında) zaten kayıtlı kullanıcı var mı?
-            $nameTaken = User::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($validated['name']))])->exists();
-
-            if ($nameTaken) {
-                return back()->withInput()->withErrors([
-                    'name' => 'Bu ad soyad ile zaten kayıtlı bir kullanıcı var. Farklı bir kimlik no ile daha önce kayıt olduysanız, o bilgilerle giriş yapın veya "Şifremi Unuttum" seçeneğini kullanın.',
-                ]);
-            }
-
-            $user = User::create([
-                'employee_id' => $validated['employee_id'],
-                'name'        => $validated['name'],
-                'email'       => $validated['employee_id'] . '@sirket.local',
-                'password'    => Hash::make($validated['password']),
-                'role'        => 'personel',
+        if (! Hash::check($validated['password'], $user->password)) {
+            return back()->withInput()->withErrors([
+                'password' => 'Şifre hatalı.',
             ]);
         }
 
@@ -71,6 +54,59 @@ class LoginController extends Controller
     }
 
     /**
+     * Kayıt Ol — kimlik no artık otomatik, sıralı olarak atanır (000001, 000002, ...).
+     */
+    public function showRegisterForm(): View
+    {
+        return view('auth.register');
+    }
+
+    public function register(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'password' => ['required', 'string', 'size:6', $this->passwordDigitRule(), 'confirmed'],
+        ]);
+
+        // Aynı isimle başka bir hesap açılmasını engelle
+        $nameTaken = User::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($validated['name']))])->exists();
+
+        if ($nameTaken) {
+            return back()->withInput()->withErrors([
+                'name' => 'Bu ad soyad ile zaten kayıtlı bir kullanıcı var.',
+            ]);
+        }
+
+        $employeeId = $this->generateNextEmployeeId();
+
+        $user = User::create([
+            'employee_id' => $employeeId,
+            'name'        => $validated['name'],
+            'email'       => $employeeId . '@sirket.local',
+            'password'    => Hash::make($validated['password']),
+            'role'        => 'personel',
+        ]);
+
+        session(['user_id' => $user->id]);
+
+        return redirect()->route('rooms.index')->with(
+            'success',
+            'Hoş geldiniz, ' . $user->name . '! Şirket Kimlik Numaranız: ' . $employeeId . ' — bir sonraki girişleriniz için bu numarayı saklayın.'
+        );
+    }
+
+    /**
+     * Sıradaki 6 haneli, sıfırla dolgulu kimlik numarasını üretir (000001, 000002, ...).
+     */
+    private function generateNextEmployeeId(): string
+    {
+        $last = User::orderByRaw('CAST(employee_id AS UNSIGNED) DESC')->first();
+        $next = $last ? ((int) $last->employee_id) + 1 : 1;
+
+        return sprintf('%06d', $next);
+    }
+
+    /**
      * Şifremi Unuttum - Adım 1: Kimlik no + ad soyad doğrulama formu.
      */
     public function showForgotPasswordForm(): View
@@ -78,10 +114,6 @@ class LoginController extends Controller
         return view('auth.forgot-password');
     }
 
-    /**
-     * Şifremi Unuttum - Adım 1: Kimlik + isim eşleşmesini kontrol eder,
-     * eşleşirse sıfırlama izni session'a yazılır ve yeni şifre formuna yönlendirilir.
-     */
     public function verifyForgotPassword(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -102,10 +134,6 @@ class LoginController extends Controller
         return redirect()->route('password.reset-form');
     }
 
-    /**
-     * Şifremi Unuttum - Adım 2: Yeni şifre belirleme formu.
-     * Sadece bir önceki adımda doğrulama yapan kullanıcı erişebilir.
-     */
     public function showResetPasswordForm(): View|RedirectResponse
     {
         $userId = session('password_reset_user_id');
@@ -119,9 +147,6 @@ class LoginController extends Controller
         return view('auth.reset-password');
     }
 
-    /**
-     * Şifremi Unuttum - Adım 2: Yeni şifreyi kaydeder.
-     */
     public function resetPassword(Request $request): RedirectResponse
     {
         $userId = session('password_reset_user_id');
@@ -134,7 +159,7 @@ class LoginController extends Controller
         }
 
         $validated = $request->validate([
-            'password' => 'required|string|size:6|confirmed',
+            'password' => ['required', 'string', 'size:6', $this->passwordDigitRule(), 'confirmed'],
         ]);
 
         $user->update([
@@ -147,46 +172,24 @@ class LoginController extends Controller
     }
 
     /**
-     * Şirket Kimlik No için özel doğrulama kuralı.
+     * Şifre kuralı: tam 6 haneli rakam, ama bir rakam en fazla 2 kez tekrar edebilir.
+     * (örn: 112233 geçerli, 111234 geçersiz çünkü '1' 3 kez tekrar ediyor)
      */
-    private function employeeIdRule(): \Closure
+    private function passwordDigitRule(): \Closure
     {
         return function (string $attribute, mixed $value, \Closure $fail): void {
-            if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                return;
-            }
-
             if (! preg_match('/^\d{6}$/', $value)) {
-                $fail('Kimlik no geçerli bir e-posta adresi olmalı veya 6 haneli rakamlardan oluşmalı.');
+                $fail('Şifre 6 haneli rakamlardan oluşmalıdır.');
                 return;
             }
 
-            $digits = array_map('intval', str_split($value));
+            $counts = array_count_values(str_split($value));
 
-            $isAscending = true;
-            for ($i = 1; $i < count($digits); $i++) {
-                if ($digits[$i] !== $digits[$i - 1] + 1) {
-                    $isAscending = false;
-                    break;
+            foreach ($counts as $count) {
+                if ($count > 2) {
+                    $fail('Şifrede bir rakam en fazla 2 kez tekrar edebilir.');
+                    return;
                 }
-            }
-
-            $isDescending = true;
-            for ($i = 1; $i < count($digits); $i++) {
-                if ($digits[$i] !== $digits[$i - 1] - 1) {
-                    $isDescending = false;
-                    break;
-                }
-            }
-
-            if ($isAscending || $isDescending) {
-                $fail('Kimlik no sıralı rakamlardan oluşamaz (örn: 123456, 654321).');
-                return;
-            }
-
-            if (count(array_unique($digits)) !== count($digits)) {
-                $fail('Kimlik no tekrarlı rakamlar içeremez, her rakam farklı olmalı.');
-                return;
             }
         };
     }

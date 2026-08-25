@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="refresh" content="60">
     <title>{{ $room->name }} - Brifing Ekranı</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/ido-logo.jpg') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -85,12 +86,9 @@
 <body>
 
     <div class="header d-flex justify-content-between align-items-center">
-    <div class="d-flex align-items-center gap-3">
-        <img src="{{ asset('images/ido-logo.jpg') }}" alt="İDO" style="height:50px; width:auto; border-radius:4px;">
-        <h1 class="room-name mb-0">{{ $room->name }}</h1>
+        <h1 class="room-name">{{ $room->name }}</h1>
+        <div class="clock">{{ $now->format('d.m.Y') }} — {{ $now->format('H:i') }}</div>
     </div>
-    <div class="clock">{{ $now->format('d.m.Y') }} — {{ $now->format('H:i') }}</div>
-</div>
 
     <div class="main-status {{ $room->is_faulty ? 'status-faulty' : ($currentMeeting ? 'status-busy' : 'status-free') }}">
         @if ($room->is_faulty)

@@ -10,7 +10,8 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-
+Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [LoginController::class, 'register'])->name('register.submit');
 
 Route::get('/forgot-password', [LoginController::class, 'showForgotPasswordForm'])->name('password.forgot');
 Route::post('/forgot-password', [LoginController::class, 'verifyForgotPassword'])->name('password.forgot.submit');
@@ -30,5 +31,3 @@ Route::get('/signage/{room}', [SignageController::class, 'show'])->name('signage
 Route::get('/', function () {
     return redirect()->route('rooms.index');
 });
-Route::post('/rooms/{room}/mark-faulty', [RoomController::class, 'markFaulty'])->name('rooms.mark-faulty');
-Route::post('/rooms/{room}/clear-faulty', [RoomController::class, 'clearFaulty'])->name('rooms.clear-faulty');

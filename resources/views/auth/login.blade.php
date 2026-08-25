@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giriş - Toplantı Yönetim Sistemi</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/ido-logo.jpg') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
@@ -11,10 +12,7 @@
             --ido-blue: #0072BC;
             --ido-orange: #F7941D;
         }
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
+        html, body { height: 100%; margin: 0; }
         body {
             background: linear-gradient(160deg, #002A42 0%, var(--ido-navy) 45%, #0072BC 100%);
             min-height: 100vh;
@@ -74,7 +72,6 @@
 </head>
 <body class="d-flex align-items-center" style="min-height:100vh;">
 
-    <!-- Gemi silüeti: gövde, kabin, baca, duman -->
     <svg class="ship-decor" viewBox="0 0 240 140" xmlns="http://www.w3.org/2000/svg">
         <path d="M10 92 C 40 90, 200 90, 230 92 L 214 120 C 160 126, 80 126, 26 120 Z" fill="#ffffff"></path>
         <rect x="55" y="58" width="90" height="34" rx="3" fill="#ffffff"></rect>
@@ -89,7 +86,6 @@
         <line x1="140" y1="92" x2="140" y2="58" stroke="#ffffff" stroke-width="2"></line>
     </svg>
 
-    <!-- 4 katmanlı, animasyonlu deniz dalgaları -->
     <div class="wave-bg">
         <svg viewBox="0 0 2400 260" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <g class="wave-layer-1">
@@ -136,17 +132,11 @@
                 <form action="{{ route('login.submit') }}" method="POST">
                     @csrf
 
-                    <div class="mb-3">
-                        <label class="form-label">Şirket Kimlik No</label>
-                        <input type="text" name="employee_id" class="form-control" value="{{ old('employee_id') }}" required autofocus autocomplete="off">
-                        <div class="form-text">Geçerli bir e-posta veya sıralı/tekrarsız 6 haneli sayı (örn: 582917).</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Ad Soyad</label>
-                        <input type="text" name="name" class="form-control" value="{{ old('name') }}" required autocomplete="off">
-                    </div>
-
+                  <div class="mb-3">
+    <label class="form-label">Şirket Kimlik No</label>
+    <input type="text" name="employee_id" class="form-control" value="{{ old('employee_id') }}" required autofocus autocomplete="off">
+    <div class="form-text">Kayıt sırasında size verilen 6 haneli numara (örn: 000001).</div>
+</div>
                     <div class="mb-3">
                         <label class="form-label">Şifre</label>
                         <div class="input-group">
@@ -165,6 +155,8 @@
                 </form>
 
                 <div class="text-center mt-3">
+                    <a href="{{ route('register') }}" class="small">Hesabınız yok mu? Kayıt Olun</a>
+                    <span class="text-muted small mx-1">·</span>
                     <a href="{{ route('password.forgot') }}" class="small">Şifremi Unuttum</a>
                 </div>
 

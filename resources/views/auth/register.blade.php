@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeni Şifre Belirle - Toplantı Yönetim Sistemi</title>
+    <title>Kayıt Ol - Toplantı Yönetim Sistemi</title>
     <link rel="icon" type="image/jpeg" href="{{ asset('images/ido-logo.jpg') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -110,8 +110,11 @@
     <div class="container" style="max-width:420px; position:relative; z-index:3;">
         <div class="card login-card shadow-lg">
             <div class="card-body p-4">
-                <h1 class="h4 mb-2 text-center">Yeni Şifre Belirle</h1>
-                <p class="text-muted text-center small mb-4">Kimliğiniz doğrulandı. Yeni şifrenizi girin.</p>
+                <div class="text-center mb-3">
+                    <img src="{{ asset('images/ido-logo.jpg') }}" alt="İDO" style="height:60px; width:auto;">
+                </div>
+                <h1 class="h4 mb-2 text-center">Hesap Oluştur</h1>
+                <p class="text-muted text-center small mb-4">Şirket kimlik numaranız kayıt sonrası otomatik atanacaktır.</p>
 
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -123,22 +126,26 @@
                     </div>
                 @endif
 
-                <form action="{{ route('password.reset') }}" method="POST">
+                <form action="{{ route('register.submit') }}" method="POST">
                     @csrf
 
-                   <div class="mb-3">
-    <label class="form-label">Yeni Şifre</label>
-    <input type="password" name="password" class="form-control" required minlength="6" maxlength="6">
-    <div class="form-text">6 haneli rakam olmalı. Bir rakam en fazla 2 kez tekrar edebilir.</div>
-</div>>
+                    <div class="mb-3">
+                        <label class="form-label">Ad Soyad</label>
+                        <input type="text" name="name" class="form-control" value="{{ old('name') }}" required autofocus autocomplete="off">
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Yeni Şifre (Tekrar)</label>
-                        <input type="password" name="password_confirmation" class="form-control" required minlength="6" maxlength="6">
+                        <label class="form-label">Şifre</label>
+                        <input type="password" name="password" class="form-control" required minlength="6" maxlength="6" autocomplete="off">
+                        <div class="form-text">6 haneli rakam olmalı. Bir rakam en fazla 2 kez tekrar edebilir (örn: 112233 geçerli, 111234 geçersiz).</div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">Şifreyi Güncelle</button>
+                    <div class="mb-3">
+                        <label class="form-label">Şifre (Tekrar)</label>
+                        <input type="password" name="password_confirmation" class="form-control" required minlength="6" maxlength="6" autocomplete="off">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Kayıt Ol</button>
                 </form>
             </div>
         </div>

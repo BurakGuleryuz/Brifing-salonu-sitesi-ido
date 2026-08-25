@@ -9,6 +9,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Toplantı Yönetim Sistemi')</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/ido-logo.jpg') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
@@ -128,6 +129,8 @@
                             <span class="badge bg-warning text-dark ms-1">Özel Kalem Müdürü</span>
                         @elseif ($authUser->role === 'bakim_sorumlusu')
                             <span class="badge ms-1" style="background-color:#F7941D;">Bakım Sorumlusu</span>
+                        @elseif ($authUser->role === 'stajyer')
+                            <span class="badge bg-secondary ms-1">Stajyer</span>
                         @endif
                     </span>
                     <form action="{{ route('logout') }}" method="POST" class="m-0">
@@ -139,7 +142,6 @@
         </div>
     </nav>
 
-    <!-- 4 katmanlı, animasyonlu dalga ayırıcı -->
     <div class="wave-divider">
         <svg viewBox="0 0 2400 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <g class="wave-layer-1">
