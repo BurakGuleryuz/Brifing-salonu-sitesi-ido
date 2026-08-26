@@ -1,7 +1,7 @@
 # 🛳️ Dijital Signage ve Toplantı Odası Yönetim Sistemi
 
-> İstanbul Deniz Otobüsleri (İDO) — Bilgi Teknolojileri Birimi  
-> **Staj Projesi** | Ağustos 2026 | Burak Güleryüz
+> **İstanbul Deniz Otobüsleri (İDO)** — Bilgi Teknolojileri Birimi  
+> Staj Projesi · Ağustos 2026 · Burak Güleryüz
 
 ---
 
@@ -10,8 +10,8 @@
 Şirket içi toplantı odalarının rezervasyon, çakışma denetimi ve anlık doluluk gösteriminin tek bir rol tabanlı sistem üzerinden yönetilmesini sağlayan bir web uygulamasıdır.
 
 **Çözülen problemler:**
-- ❌ Aynı oda ve saatte birden fazla toplantı ayarlanabiliyordu (çakışma)
-- ❌ Odaların doluluk durumu salonun önüne gelinmeden anlaşılamıyordu
+- Aynı oda ve saatte birden fazla toplantı ayarlanabiliyordu **(çakışma)**
+- Odaların doluluk durumu salonun önüne gelinmeden anlaşılamıyordu
 
 ---
 
@@ -26,15 +26,33 @@
 | 🔧 Arıza Modülü | Bakım sorumlusu oda arızasını işaretleyebilir |
 | 📧 Acil Bildirim | Acil toplantılarda tüm kullanıcılara otomatik e-posta |
 | 🏛️ Yönetim Kurulu | Gizli toplantı tipi; yalnızca yetkili rol görebilir |
+| 🔑 Otomatik Kimlik No | Kayıtta 000001, 000002... formatında sıralı numara atanır |
 
 ---
 
 ## 🛠️ Teknolojiler
 
+![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=flat&logo=laravel&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=bootstrap&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
+
 - **Backend:** PHP 8 · Laravel 12 · Eloquent ORM
 - **Frontend:** Blade · Bootstrap 5 · JavaScript · SVG Animasyonlar
 - **Veritabanı:** MySQL (XAMPP)
 - **Araçlar:** Git · GitHub · Artisan CLI · Composer
+
+---
+
+## 🗄️ Veritabanı Yapısı
+
+| Tablo | Önemli Alanlar |
+|---|---|
+| `users` | employee_id, name, password, role |
+| `rooms` | name, location, capacity, is_active, is_faulty, fault_note |
+| `meetings` | title, room_id, organizer, type, priority, start_time, end_time |
 
 ---
 
@@ -62,7 +80,7 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-### `.env` Veritabanı Ayarları
+`.env` dosyasında veritabanı ayarlarını düzenle:
 
 ```env
 DB_CONNECTION=mysql
@@ -83,13 +101,13 @@ php artisan migrate
 php artisan serve
 ```
 
-Uygulama `http://127.0.0.1:8000` adresinde çalışacak.
+Uygulama `http://127.0.0.1:8000` adresinde çalışır.
 
 ---
 
 ## 👤 Kullanıcı Oluşturma
 
-`/register` sayfasından kayıt ol. İlk kayıt otomatik olarak `000001` kimlik numarasını alır.
+`/register` sayfasından kayıt ol — kimlik numarası otomatik atanır (000001, 000002...).
 
 Rol atamak için:
 
@@ -101,56 +119,109 @@ php artisan tinker
 App\Models\User::where('employee_id', '000001')->update(['role' => 'ozel_kalem_muduru']);
 App\Models\User::where('employee_id', '000002')->update(['role' => 'bakim_sorumlusu']);
 App\Models\User::where('employee_id', '000003')->update(['role' => 'personel']);
-// rol belirtilmezse varsayılan: personel
+App\Models\User::where('employee_id', '000004')->update(['role' => 'stajyer']);
 ```
 
 ---
 
 ## 🔐 Rol Yetki Matrisi
 
-| Rol | Toplantı Oluşturma | Düzenleme | Oda Arıza Durumu |
+| Rol | Toplantı Oluşturma | Düzenleme/Silme | Arıza Yönetimi |
 |---|:---:|:---:|:---:|
 | Stajyer | ❌ | ❌ | ❌ |
 | Personel | ✅ | ❌ | ❌ |
 | Bakım Sorumlusu | ❌ | ❌ | ✅ |
 | Özel Kalem Müdürü | ✅ | ✅ | ✅ |
 
-> Yönetim Kurulu toplantıları yalnızca Özel Kalem Müdürü tarafından görülebilir/oluşturulabilir.
+> Yönetim Kurulu toplantıları yalnızca Özel Kalem Müdürü tarafından görülebilir ve oluşturulabilir.
+
+---
+
+## 📺 Brifing (Signage) Ekranı Kullanımı
+
+Her oda için ayrı bir URL vardır:
+
+```
+http://127.0.0.1:8000/signage/{oda_id}
+```
+
+Örnekler:
+```
+http://127.0.0.1:8000/signage/6
+http://127.0.0.1:8000/signage/7
+```
+
+Bu URL'yi oda kapısındaki TV veya tablette **tam ekran** açık bırakın.
+
+- ✅ Şifre **gerekmez**
+- 🔄 60 saniyede bir **otomatik güncellenir**
+- 🟢 Müsait / 🔴 Dolu / ⚠️ Arızalı durumunu renklerle gösterir
+- Bugünün sonraki toplantılarını listeler
 
 ---
 
 ## 🏗️ Sistem Mimarisi
 
-Klasik Laravel MVC mimarisi kullanılmıştır:
-
-- **Route** → İstekleri controller'a yönlendirir
-- **Middleware** → Giriş yapmamış kullanıcıyı engeller  
-- **Controller** → İş mantığı + rol tabanlı yetki kontrolü
-- **Model** → Veritabanı ilişkileri + çakışma algoritması
-- **View** → Blade şablonları ile kullanıcı arayüzü
+```
+Tarayıcı
+   ↓
+Route (routes/web.php)
+   ├── Herkese açık: /login, /register, /signage/{room}
+   └── Korumalı (auth.simple): /rooms/*, /meetings/*
+         ↓
+   Middleware (EnsureUserIsLoggedIn)
+         ↓
+   ┌──────────────────────────────────┐
+   │          Laravel MVC             │
+   │  Views ←→ Controllers ←→ Models  │
+   └──────────────────────────────────┘
+         ↓
+   MySQL Veritabanı
+      ↙          ↘
+Brifing Ekranı   Yönetim Paneli
+(şifresiz, TV)   (rol bazlı)
+```
 
 ---
 
 ## 📁 Proje Yapısı
 
+```
 brifing-site/
 ├── app/Http/Controllers/
-│ ├── Auth/LoginController.php # Giriş, kayıt, şifre sıfırlama
-│ ├── RoomController.php # Oda CRUD + arıza yönetimi
-│ ├── MeetingController.php # Toplantı CRUD + çakışma + mail
-│ └── SignageController.php # Brifing ekranı
+│   ├── Auth/LoginController.php   # Giriş, kayıt, şifre sıfırlama
+│   ├── RoomController.php         # Oda CRUD + arıza yönetimi
+│   ├── MeetingController.php      # Toplantı CRUD + çakışma + mail
+│   └── SignageController.php      # Brifing ekranı
 ├── app/Models/
-│ ├── User.php # Roller, kimlik no
-│ ├── Room.php # Aktif/pasif/arızalı durum
-│ └── Meeting.php # Çakışma kontrolü (scopeOverlapping)
+│   ├── User.php                   # Roller, otomatik kimlik no
+│   ├── Room.php                   # Aktif/pasif/arızalı durum
+│   └── Meeting.php                # scopeOverlapping() çakışma kontrolü
 ├── resources/views/
-│ ├── auth/ # Giriş, kayıt, şifre sıfırlama
-│ ├── rooms/ # Oda yönetim ekranları
-│ ├── meetings/ # Toplantı yönetim ekranları
-│ ├── signage/ # Brifing ekranı (TV için)
-│ └── layouts/app.blade.php # Ortak layout
+│   ├── auth/                      # Giriş, kayıt, şifre sıfırlama
+│   ├── rooms/                     # Oda yönetim ekranları
+│   ├── meetings/                  # Toplantı yönetim ekranları
+│   ├── signage/show.blade.php     # Brifing ekranı (TV için)
+│   └── layouts/app.blade.php      # Ortak layout + animasyonlar
+├── docs/screenshots/              # Ekran görüntüleri
 └── routes/web.php
+```
 
+---
+
+## 📸 Ekran Görüntüleri
+
+### Giriş Ekranı
+![Giriş Ekranı](docs/screenshots/login.png)
+
+### Odalar Yönetim Paneli
+![Odalar](docs/screenshots/rooms.png)
+
+### Toplantılar Listesi
+![Toplantılar](docs/screenshots/meetings.png)
+
+### Brifing Ekranı
+![Signage](docs/screenshots/signage.png)
 
 ---
 
